@@ -1,0 +1,321 @@
+@page "/"
+
+@inject IJSRuntime Js 
+@inject BudgetManager BudgetManager 
+
+<!-- Huvudbehållare för komponenten. `@key` hjälper Blazor att effektivt uppdatera gränssnittet när `selectedYear` eller `selectedMonth` ändras. -->
+<div @key="selectedYear + '-' + selectedMonth">
+    <!-- Behållare för rullgardinsmenyerna för månad och år -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; margin-left: 12px;">
+        <!-- Rullgardinsmeny för att välja månad. `@bind-Value` kopplar värdet till `selectedMonth` och `@bind-Value:after` anropar `PeriodChanged` efter att värdet har uppdaterats. -->
+        <InputSelect @bind-Value="selectedMonth" @bind-Value:after="PeriodChanged" style="font-size: 20px;">
+            <!-- Loopar igenom alla månader och skapar ett alternativ för varje -->
+            @foreach (var m in months)
+            {
+                <option value="@m.Value">@m.Name</option>
+            }
+        </InputSelect>
+        <!-- Rullgardinsmeny för att välja år. Samma funktionalitet som för månader. -->
+        <InputSelect @bind-Value="selectedYear" @bind-Value:after="PeriodChanged" style="font-size: 20px;">
+            <!-- Loopar igenom alla år och skapar ett alternativ för varje -->
+            @foreach (var y in years)
+            {
+                <option value="@y">@y</option>
+            }
+        </InputSelect>
+    </div>
+
+    <!-- Sätter sidans titel som visas i webbläsarens flik -->
+    <PageTitle>Home</PageTitle>
+
+    <!-- Huvudrubrik för sidan -->
+    <p style="text-align: left; font-family: Arial, sans-serif; font-size: 48px; margin-left: 12px;">MinBudget+</p>
+
+    <!-- C#-kodblock för att beräkna totala inkomster, utgifter och vad som är kvar -->
+    @{
+        var incomeTotal   = BudgetManager.TotalIncome();
+        var expenseTotal  = BudgetManager.TotalExpense();
+        var leftThisMonth = BudgetManager.LeftThisMonth();
+    }
+
+    <!-- Visningsbox för "Kvar denna månad" -->
+    <div style="width: 400px; height: 200px; background-color: lightgreen;
+                display: flex; flex-direction: column; justify-content: center;
+                align-items: center; margin: 12px 0; margin-left: 12px; border: 1px solid #b2d8b2; border-radius: 8px;">
+        <p style="font-size: 28px; margin: 0; color: black;">Kvar denna månad</p>
+        <p style="font-size: 32px; font-weight: bold; margin: 0; color: black;">@leftThisMonth kr</p>
+    </div>
+
+    <!-- Behållare för inkomst- och utgiftsboxarna -->
+    <div style="display: flex; flex-direction: row; gap: 16px; margin-left: 12px;">
+        <!-- Visningsbox för total inkomst -->
+        <div style="width: 190px; height: 200px; background-color: lightblue;
+                    display: flex; flex-direction: column; justify-content: center;
+                    align-items: center; border: 1px solid #b2d8b2; border-radius: 8px;">
+            <p style="font-size: 28px; margin: 0; color: black;">Inkomst</p>
+            <p style="font-size: 32px; font-weight: bold; margin: 0; color: black;">@incomeTotal kr</p>
+        </div>
+        <!-- Visningsbox för totala utgifter -->
+        <div style="width: 190px; height: 200px; background-color: lightcoral;
+                    display: flex; flex-direction: column; justify-content: center;
+                    align-items: center; border: 1px solid #d8b2b2; border-radius: 8px;">
+            <p style="font-size: 28px; margin: 0; color: black;">Utgifter</p>
+            <p style="font-size: 32px; font-weight: bold; margin: 0; color: black;">@expenseTotal kr</p>
+        </div>
+    </div>
+
+    <!-- Behållare för knapparna och formulären för att lägga till inkomst/utgift -->
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-left: 12px; margin-top: 22px; width: 400px;">
+        <!-- Villkorlig rendering: Om `showIncomeForm` är falskt, visa knappen -->
+        @if (!showIncomeForm)
+        {
+            <!-- Knapp för att visa inkomstformuläret -->
+            <button style="width: 100%; height: 48px; background-color: #b2d8b2; color: black; font-size: 24px; border-radius: 8px; border: 1px solid #b2d8b2;" @onclick="() => showIncomeForm = true">+ Lägg till inkomst</button>
+        }
+        else
+        {
+            <!-- Annars, visa inkomstformuläret -->
+            <div style="width: 100%; background-color: #eaffea; border: 1px solid #b2d8b2; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; align-items: center;">
+                <!-- Formulär för att lägga till en ny inkomst. `OnValidSubmit` anropar `AddIncomeAsync` när formuläret skickas och är giltigt. -->
+                <EditForm Model="_incomeModel" OnValidSubmit="AddIncomeAsync">
+                    <div style="display: flex; flex-direction: row; gap: 6px; align-items: center;">
+                        <button type="submit">➕</button>
+                        <!-- Inmatningsfält för belopp, kopplat till `_incomeModel.Value` -->
+                        <InputNumber @bind-Value="_incomeModel.Value" placeholder="Lägg till inkomst..." />
+                        <!-- Rullgardinsmeny för kategori, kopplat till `_incomeModel.Category` -->
+                        <InputSelect @bind-Value="_incomeModel.Category" style="width: 60px;">
+                            <option value="Lön">Lön</option>
+                            <option value="CSN">CSN</option>
+                        </InputSelect>
+                    </div>
+                    <div style="margin-top: 8px; width: 100%;">
+                        <!-- Inmatningsfält för notering, kopplat till `_incomeModel.Description` -->
+                        <InputText @bind-Value="_incomeModel.Description" placeholder="Notering (valfritt)" style="width: 100%;" />
+                    </div>
+                </EditForm>
+                <!-- Knapp för att dölja formuläret -->
+                <button style="margin-top: 8px;" @onclick="() => showIncomeForm = false">Avbryt</button>
+            </div>
+        }
+        <!-- Samma logik som ovan, men för utgifter -->
+        @if (!showExpenseForm)
+        {
+            <button style="width: 100%; height: 48px; background-color: #d8b2b2; color: black; font-size: 24px; border-radius: 8px; border: 1px solid #d8b2b2;" @onclick="() => showExpenseForm = true">+ Lägg till utgift</button>
+        }
+        else
+        {
+            <div style="width: 100%; background-color: #ffeaea; border: 1px solid #d8b2b2; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; align-items: center;">
+                <EditForm Model="_expenseModel" OnValidSubmit="AddExpenseAsync">
+                    <div style="display: flex; flex-direction: row; gap: 6px; align-items: center;">
+                        <button type="submit">➕</button>
+                        <InputNumber @bind-Value="_expenseModel.Value" placeholder="Lägg till utgifter..." />
+                        <InputSelect @bind-Value="_expenseModel.Category" style="width: 60px;">
+                            <option value="Mat">Mat</option>
+                            <option value="Hyra">Hyra</option>
+                            <option value="Nöje">Nöje</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Övrigt">Övrigt</option>
+                            <option value="Spara">Spara</option>
+                        </InputSelect>
+                    </div>
+                    <div style="margin-top: 8px; width: 100%;">
+                        <InputText @bind-Value="_expenseModel.Description" placeholder="Notering (valfritt)" style="width: 100%;" />
+                    </div>
+                </EditForm>
+                <button style="margin-top: 8px;" @onclick="() => showExpenseForm = false">Avbryt</button>
+            </div>
+        }
+    </div>
+
+    <!-- Villkorlig rendering: Visa bara cirkeldiagrammet om det finns några utgifter -->
+    @if (BudgetManager.Expenses.Count > 0)
+    {
+        <!-- Behållare för cirkeldiagram och dess förklaring -->
+        <div style="display: flex; flex-direction: row; align-items: center; margin-left: 12px; margin-top: 24px;">
+            <!-- SVG-element för att rita cirkeldiagrammet -->
+            <svg width="160" height="160" viewBox="0 0 200 200" style="transform: rotate(-90deg);">
+                <circle r="70" cx="100" cy="100" fill="transparent" stroke="#e6e6e6" stroke-width="40" />
+                <!-- Loopar igenom varje "tårtbit" och ritar den -->
+                @foreach (var slice in GetDonutSlices())
+                {
+                    <circle r="70" cx="100" cy="100" fill="transparent"
+                            stroke="@slice.Color"
+                            stroke-width="40"
+                            stroke-dasharray="@slice.StrokeDashArray"
+                            stroke-dashoffset="@slice.StrokeDashOffset" />
+                }
+            </svg>
+            <!-- Behållare för förklaringen (legend) -->
+            <div style="margin-left: 16px;">
+                <!-- Loopar igenom varje kategori och visar dess färg, namn och procentandel -->
+                @foreach (var cat in GetCategoryPercentages())
+                {
+                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                        <span style="display: inline-block; width: 16px; height: 16px; background: @cat.Color; border-radius: 50%; margin-right: 8px;"></span>
+                        <span>@cat.Name @cat.Percent% </span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Start på C#-kodblocket för komponenten -->
+@code {
+    // Variabler för att styra synligheten av inkomst- och utgiftsformulären
+    private bool showIncomeForm = false;
+    private bool showExpenseForm = false;
+    
+    // Datamodeller för att binda data från formulären
+    public class IncomeInputModel { public decimal? Value { get; set; } public string Category { get; set; } = "Lön"; public string? Description { get; set; } }
+    public class ExpenseInputModel { public decimal? Value { get; set; } public string Category { get; set; } = "Mat"; public string? Description { get; set; } }
+
+    // Instanser av modellerna som används för databindning i formulären
+    private IncomeInputModel _incomeModel = new();
+    private ExpenseInputModel _expenseModel = new();
+
+    // Lokala variabler för att hålla den valda månaden och året
+    private int selectedMonth;
+    private int selectedYear;
+    
+    // En array av månader för rullgardinsmenyn
+    private readonly (int Value, string Name)[] months = new[] {
+        (1, "Januari"), (2, "Februari"), (3, "Mars"), (4, "April"), (5, "Maj"), (6, "Juni"),
+        (7, "Juli"), (8, "Augusti"), (9, "September"), (10, "Oktober"), (11, "November"), (12, "December")
+    };
+    // En array av år för rullgardinsmenyn
+    private readonly int[] years = Enumerable.Range(DateTime.Now.Year - 5, 11).ToArray();
+
+    // Metod som körs när komponenten först initieras
+    protected override async Task OnInitializedAsync()
+    {
+        // Sätt den initiala perioden från BudgetManager
+        selectedYear = BudgetManager.SelectedYear;
+        selectedMonth = BudgetManager.SelectedMonth;
+        // Laddar budgetdata för den period som är sparad i BudgetManager
+        await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+    }
+
+    // Metod som anropas när användaren byter månad eller år i rullgardinsmenyerna
+    private async Task PeriodChanged()
+    {
+        // Laddar budgetdata för den nya valda perioden
+        await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+    }
+
+    // Metod för att lägga till en ny inkomst
+    private async Task AddIncomeAsync()
+    {
+        // Kontrollerar att ett giltigt värde har angetts
+        if (_incomeModel.Value is > 0)
+        {
+            // Lägger till inkomsten via BudgetManager
+            await BudgetManager.AddIncomeAsync(new Income { Amount = _incomeModel.Value.Value, Category = _incomeModel.Category, Description = _incomeModel.Description });
+            // Återställer formulärets fält
+            _incomeModel.Value = null;
+            _incomeModel.Category = "Lön";
+            _incomeModel.Description = null;
+            // Laddar om datan för att uppdatera gränssnittet
+            await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+            // Meddelar Blazor att gränssnittet behöver ritas om
+            StateHasChanged();
+        }
+    }
+
+    // Metod för att lägga till en ny utgift (liknande `AddIncomeAsync`)
+    private async Task AddExpenseAsync()
+    {
+        if (_expenseModel.Value is > 0)
+        {
+            await BudgetManager.AddExpenseAsync(new Expense { Amount = _expenseModel.Value.Value, Category = _expenseModel.Category, Description = _expenseModel.Description });
+            _expenseModel.Value = null;
+            _expenseModel.Category = "Mat";
+            _expenseModel.Description = null;
+            await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+            StateHasChanged();
+        }
+    }
+
+    // Metod för att ta bort en inkomst (används för närvarande inte i UI)
+    private async Task RemoveIncome(int index)
+    {
+        await BudgetManager.RemoveIncomeAsync(index);
+        await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+        StateHasChanged();
+    }
+
+    // Metod för att ta bort en utgift (används för närvarande inte i UI)
+    private async Task RemoveExpense(int index)
+    {
+        await BudgetManager.RemoveExpenseAsync(index);
+        await BudgetManager.LoadAsync(selectedYear, selectedMonth);
+        StateHasChanged();
+    }
+
+    // Hjälpklasser för att representera data för cirkeldiagrammet
+    public class DonutSlice { public string Color { get; set; } public string StrokeDashArray { get; set; } public double StrokeDashOffset { get; set; } }
+    public class CategoryPercent { public string? Name { get; set; } public double Percent { get; set; } public string? Color { get; set; } }
+
+    // Fördefinierade färger och namn för utgiftskategorierna
+    private readonly string[] _categoryColors = { "#a3d8f4", "#f7a072", "#f7d6e0", "#b4f8c8", "#c2b2f7", "#f7f7b2" };
+    private readonly string[] _categoryNames = { "Mat", "Hyra", "Nöje", "Transport", "Övrigt", "Spara" };
+
+    // Metod för att beräkna procentandelen för varje utgiftskategori
+    private List<CategoryPercent> GetCategoryPercentages()
+    {
+        double total = (double)BudgetManager.Expenses.Sum(e => e.Amount);
+        var cats = new List<CategoryPercent>();
+        for (int i = 0; i < _categoryNames.Length; i++)
+        {
+            double sum = (double)BudgetManager.Expenses.Where(e => e.Category == _categoryNames[i]).Sum(e => e.Amount);
+            double percent = total > 0 ? Math.Round(sum / total * 100, 1) : 0;
+            cats.Add(new CategoryPercent { Name = _categoryNames[i], Percent = percent, Color = _categoryColors[i] });
+        }
+        // Om det inte finns några utgifter, visa en standardtext
+        if (total == 0)
+        {
+            cats.Clear();
+            cats.Add(new CategoryPercent { Name = "Inga utgifter", Percent = 100, Color = "#eee" });
+        }
+        return cats;
+    }
+
+    // Metod för att generera SVG-attributen för varje "munkbit" i diagrammet
+    private List<DonutSlice> GetDonutSlices()
+    {
+        var cats = GetCategoryPercentages();
+        var slices = new List<DonutSlice>();
+        double circumference = 2 * Math.PI * 70; // Radie är 70
+        double offset = 0;
+
+        foreach (var cat in cats.Where(c => c.Percent > 0))
+        {
+            double percentage = cat.Percent;
+            double dash = (percentage / 100) * circumference;
+            
+            slices.Add(new DonutSlice
+            {
+                Color = cat.Color,
+                StrokeDashArray = $"{dash} {circumference}",
+                StrokeDashOffset = -offset
+            });
+
+            offset += dash;
+        }
+        return slices;
+    }
+
+    // Hjälpmetod för att skapa SVG-sökvägen för en cirkelbåge (en tårtbit)
+    private string DescribeArc(double x, double y, double radius, double startAngle, double endAngle)
+    {
+        double startRadians = (Math.PI / 180.0) * (startAngle - 90);
+        double endRadians = (Math.PI / 180.0) * (endAngle - 90);
+        double x1 = x + radius * Math.Cos(startRadians);
+        double y1 = y + radius * Math.Sin(startRadians);
+        double x2 = x + radius * Math.Cos(endRadians);
+        double y2 = y + radius * Math.Sin(endRadians);
+        bool largeArc = endAngle - startAngle > 180;
+        // Skapar SVG-sökvädssträngen
+        return $"M{x} {y} L{x1} {y1} A{radius} {radius} 0 {(largeArc ? 1 : 0)} 1 {x2} {y2} Z";
+    }
+}

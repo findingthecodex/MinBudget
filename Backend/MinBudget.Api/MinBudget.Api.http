@@ -1,0 +1,6 @@
+@MinBudget.Api_HostAddress = http://localhost:5136
+
+GET {{MinBudget.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
