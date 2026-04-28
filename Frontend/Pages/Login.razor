@@ -1,0 +1,162 @@
+@page "/login"
+@using MinBudget.Services
+@inject ApiClientService ApiClient
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">MinBudget Login</h2>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show">
+                            @errorMessage
+                            <button type="button" class="btn-close" @onclick="ClearError"></button>
+                        </div>
+                    }
+
+                    @if (isLoading)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <form>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" 
+                                    @bind="email" placeholder="Enter email" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" 
+                                    @bind="password" placeholder="Enter password" required>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" @onclick="HandleLogin">
+                                    Login
+                                </button>
+                            </div>
+
+                            <hr />
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-secondary" @onclick="HandleRegister">
+                                    Register New Account
+                                </button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Test credentials: user@test.com / Password123!
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string? errorMessage;
+    private bool isLoading;
+
+    private async Task HandleLogin()
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Email and password are required";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await ApiClient.LoginAsync(email, password);
+
+            if (response.Success)
+            {
+                // Redirect to home page
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = response.Error ?? "Login failed";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleRegister()
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Email and password are required";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await ApiClient.RegisterAsync(email, password);
+
+            if (response.Success)
+            {
+                errorMessage = null;
+                // Auto-login after registration
+                var loginResponse = await ApiClient.LoginAsync(email, password);
+                if (loginResponse.Success)
+                {
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    errorMessage = "Registration successful! Please login.";
+                }
+            }
+            else
+            {
+                errorMessage = response.Error ?? "Registration failed";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ClearError()
+    {
+        errorMessage = null;
+    }
+}
+

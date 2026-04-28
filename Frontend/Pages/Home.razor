@@ -1,8 +1,33 @@
 @page "/"
+@using MinBudget.Services
 
 @inject IJSRuntime Js 
 @inject BudgetManager BudgetManager 
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
 
+@if (isLoading)
+{
+    <div class="text-center mt-5">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (!isAuthenticated)
+{
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <h2 class="mb-4">Welcome to MinBudget</h2>
+                <p class="mb-4">Please login to continue</p>
+                <a href="/login" class="btn btn-primary btn-lg">Go to Login</a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
 <!-- Huvudbehållare för komponenten. `@key` hjälper Blazor att effektivt uppdatera gränssnittet när `selectedYear` eller `selectedMonth` ändras. -->
 <div @key="selectedYear + '-' + selectedMonth">
     <!-- Behållare för rullgardinsmenyerna för månad och år -->
@@ -157,11 +182,16 @@
                 }
             </div>
         </div>
-    }
+     }
 </div>
+}
 
 <!-- Start på C#-kodblocket för komponenten -->
 @code {
+    // Auth variables
+    private bool isLoading = true;
+    private bool isAuthenticated = false;
+    
     // Variabler för att styra synligheten av inkomst- och utgiftsformulären
     private bool showIncomeForm = false;
     private bool showExpenseForm = false;
@@ -189,6 +219,15 @@
     // Metod som körs när komponenten först initieras
     protected override async Task OnInitializedAsync()
     {
+        // Check authentication
+        isAuthenticated = await AuthService.IsAuthenticatedAsync();
+        isLoading = false;
+        
+        if (!isAuthenticated)
+        {
+            return;
+        }
+
         // Sätt den initiala perioden från BudgetManager
         selectedYear = BudgetManager.SelectedYear;
         selectedMonth = BudgetManager.SelectedMonth;

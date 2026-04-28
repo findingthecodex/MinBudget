@@ -12,8 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-        "Server=(localdb)\\mssqllocaldb;Database=MinBudgetDb;Trusted_Connection=true;"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
+        "Data Source=minbudget.db"));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

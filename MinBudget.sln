@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{C88A2C67-A069-406A-A12B-6088F6ED46C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinBudget", "Frontend\MinBudget\MinBudget.csproj", "{27B9F6A5-D8B1-4BC5-B175-C70C6F3F25F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinBudget", "Frontend/MinBudget.csproj", "{27B9F6A5-D8B1-4BC5-B175-C70C6F3F25F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{DE8852F8-2F31-4329-8D2E-54194201A6D9}"
 EndProject
