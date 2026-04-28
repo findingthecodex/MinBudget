@@ -9,7 +9,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 // API Base Address - adjust for production
 var apiBaseAddress = builder.HostEnvironment.IsDevelopment() 
-    ? "https://localhost:7001" 
+    ? "https://localhost:7082" 
     : "https://api.minbudget.com";
 
 // HttpClient for API

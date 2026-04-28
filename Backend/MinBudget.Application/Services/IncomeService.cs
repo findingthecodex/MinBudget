@@ -65,7 +65,7 @@ public class IncomeService : IIncomeService
             Amount = request.Amount,
             Description = request.Description,
             Category = request.Category,
-            Date = request.Date
+            Date = request.Date == DateTime.MinValue ? DateTime.UtcNow : request.Date
         };
 
         var created = await _repository.CreateAsync(income);
@@ -91,7 +91,7 @@ public class IncomeService : IIncomeService
         income.Amount = request.Amount;
         income.Description = request.Description;
         income.Category = request.Category;
-        income.Date = request.Date;
+        income.Date = request.Date == DateTime.MinValue ? DateTime.UtcNow : request.Date;
 
         await _repository.UpdateAsync(income);
     }
