@@ -65,7 +65,7 @@ public class ExpenseService : IExpenseService
             Amount = request.Amount,
             Description = request.Description,
             Category = request.Category,
-            Date = request.Date
+            Date = request.Date == DateTime.MinValue ? DateTime.UtcNow : request.Date
         };
 
         var created = await _repository.CreateAsync(expense);
@@ -91,7 +91,7 @@ public class ExpenseService : IExpenseService
         expense.Amount = request.Amount;
         expense.Description = request.Description;
         expense.Category = request.Category;
-        expense.Date = request.Date;
+        expense.Date = request.Date == DateTime.MinValue ? DateTime.UtcNow : request.Date;
 
         await _repository.UpdateAsync(expense);
     }
