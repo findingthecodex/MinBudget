@@ -43,15 +43,15 @@ else if (isAuthenticated)
     <div class="stats-row">
         <div class="stat-card card-remaining">
             <span class="card-label">Kvar denna månad</span>
-            <span class="card-value card-value-large">@leftThisMonth kr</span>
+            <span class="card-value card-value-large">@Fmt(leftThisMonth) kr</span>
         </div>
         <div class="stat-card card-income">
             <span class="card-label">Inkomst</span>
-            <span class="card-value">@incomeTotal kr</span>
+            <span class="card-value">@Fmt(incomeTotal) kr</span>
         </div>
         <div class="stat-card card-expense">
             <span class="card-label">Utgifter</span>
-            <span class="card-value">@expenseTotal kr</span>
+            <span class="card-value">@Fmt(expenseTotal) kr</span>
         </div>
     </div>
 
@@ -138,6 +138,9 @@ else if (isAuthenticated)
 }
 
 @code {
+    private static readonly System.Globalization.CultureInfo SvSE = new("sv-SE");
+    private static string Fmt(decimal v) => v.ToString("N0", SvSE);
+
     private bool isLoading = true;
     private bool isAuthenticated = false;
     private bool showIncomeForm = false;

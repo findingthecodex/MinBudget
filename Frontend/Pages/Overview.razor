@@ -58,7 +58,7 @@ else
                         }
                         else
                         {
-                            <span class="clickable" @onclick="() => EditIncomeNote(index)">@income.Amount kr</span>
+                            <span class="clickable" @onclick="() => EditIncomeNote(index)">@Fmt(income.Amount) kr</span>
                         }
                     </td>
                     <td class="actions">
@@ -149,7 +149,7 @@ else
                         }
                         else
                         {
-                            <span class="clickable" @onclick="() => EditExpenseNote(index)">@expense.Amount kr</span>
+                            <span class="clickable" @onclick="() => EditExpenseNote(index)">@Fmt(expense.Amount) kr</span>
                         }
                     </td>
                     <td class="actions">
@@ -201,7 +201,7 @@ else
                 <tr class="suggestion-row">
                     <td>@suggestion.Category</td>
                     <td>@(string.IsNullOrWhiteSpace(suggestion.Description) ? "Ingen notering" : suggestion.Description)</td>
-                    <td class="text-right">@suggestion.Amount kr</td>
+                    <td class="text-right">@Fmt(suggestion.Amount) kr</td>
                     <td class="actions">
                         <button class="btn-add-suggestion" @onclick="async () => await AddSuggestedIncome(suggestion)">+</button>
                     </td>
@@ -221,7 +221,7 @@ else
                 <tr class="suggestion-row">
                     <td>@suggestion.Category</td>
                     <td>@(string.IsNullOrWhiteSpace(suggestion.Description) ? "Ingen notering" : suggestion.Description)</td>
-                    <td class="text-right">@suggestion.Amount kr</td>
+                    <td class="text-right">@Fmt(suggestion.Amount) kr</td>
                     <td class="actions">
                         <button class="btn-add-suggestion" @onclick="async () => await AddSuggestedExpense(suggestion)">+</button>
                     </td>
@@ -235,6 +235,9 @@ else
 </div>
 
 @code {
+    private static readonly System.Globalization.CultureInfo SvSE = new("sv-SE");
+    private static string Fmt(decimal v) => v.ToString("N0", SvSE);
+
     private string incomeSortField = nameof(Income.Category);
     private bool incomeSortAsc = true;
     private string expenseSortField = nameof(Expense.Category);
