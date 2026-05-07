@@ -1,5 +1,7 @@
 @page "/login"
+@layout LoginLayout
 @using MinBudget.Services
+@using MinBudget.Layout
 @inject ApiClientService ApiClient
 @inject AuthTokenService AuthService
 @inject NavigationManager Navigation
@@ -74,6 +76,12 @@
     private string password = "";
     private string? errorMessage;
     private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+            Navigation.NavigateTo("/");
+    }
 
     private async Task HandleLogin()
     {
