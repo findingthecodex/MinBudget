@@ -103,3 +103,100 @@
     margin: 0 auto;
     padding: 1.5rem;
 }
+
+/* Hamburger — hidden on desktop */
+.hamburger {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--navbar-btn-border);
+    color: var(--navbar-link);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.hamburger:hover {
+    background: var(--navbar-btn-hover);
+    color: var(--navbar-brand);
+}
+
+/* Mobile dropdown menu */
+.mobile-menu {
+    display: flex;
+    flex-direction: column;
+    background: var(--navbar-bg);
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0.875rem 0.875rem;
+    gap: 0.25rem;
+}
+
+.mobile-menu ::deep a {
+    color: var(--navbar-link);
+    text-decoration: none;
+    padding: 0.75rem 0.875rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    display: block;
+    transition: background 0.15s, color 0.15s;
+}
+
+.mobile-menu ::deep a:hover,
+.mobile-menu ::deep a.active {
+    background: var(--navbar-link-active-bg);
+    color: var(--navbar-link-active);
+}
+
+.mobile-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.25rem 0;
+}
+
+.mobile-logout {
+    background: transparent;
+    border: 1px solid var(--navbar-btn-border);
+    color: var(--navbar-link);
+    padding: 0.75rem 0.875rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    margin-top: 0.25rem;
+}
+
+.mobile-logout:hover {
+    background: var(--navbar-btn-hover);
+    color: var(--navbar-brand);
+}
+
+@media (max-width: 600px) {
+    .navbar-inner {
+        padding: 0 1rem;
+    }
+
+    .navbar-brand {
+        margin-right: 0;
+        flex: 1;
+    }
+
+    .navbar-links,
+    .logout-btn {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+}

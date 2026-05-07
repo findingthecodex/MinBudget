@@ -294,3 +294,56 @@
     font-size: 0.875rem;
     font-variant-numeric: tabular-nums;
 }
+
+@media (max-width: 600px) {
+    .home-page {
+        padding: 1rem 0;
+    }
+
+    .period-selector {
+        margin-bottom: 1.25rem;
+        width: 100%;
+    }
+
+    .period-select {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+
+    .stats-row {
+        max-width: 100%;
+        grid-auto-rows: 130px;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+        padding: 1rem 1.25rem;
+    }
+
+    .card-value {
+        font-size: 1.5rem;
+    }
+
+    .card-value-large {
+        font-size: 2rem;
+    }
+
+    .action-section {
+        max-width: 100%;
+    }
+
+    .form-row {
+        flex-wrap: wrap;
+    }
+
+    .form-input {
+        min-width: 0;
+    }
+
+    .chart-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+}

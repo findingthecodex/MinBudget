@@ -216,3 +216,21 @@
 .btn-add-suggestion:hover {
     background: rgba(167, 139, 250, 0.25);
 }
+
+@media (max-width: 600px) {
+    .overview-page {
+        padding: 1rem 0;
+    }
+
+    .overview-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .overview-table th,
+    .overview-table td {
+        white-space: nowrap;
+        padding: 0.5rem 0.6rem;
+    }
+}
