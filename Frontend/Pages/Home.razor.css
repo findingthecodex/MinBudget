@@ -1,5 +1,8 @@
 .home-page {
     padding: 1.75rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Period selector */
@@ -10,9 +13,9 @@
 }
 
 .period-select {
-    background: #1e1e2e;
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    color: #e2e2f0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-medium);
+    color: var(--text-1);
     padding: 0.5rem 1rem;
     border-radius: 10px;
     font-size: 0.975rem;
@@ -26,54 +29,55 @@
 
 .period-select:hover,
 .period-select:focus {
-    border-color: #a78bfa;
+    border-color: var(--border-focus);
 }
 
 /* Stats cards */
 .stats-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 120px;
-    gap: 0.65rem;
-    max-width: 420px;
+    grid-auto-rows: 170px;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 520px;
     margin-bottom: 2rem;
 }
 
 .stat-card {
-    border-radius: 14px;
-    padding: 1.25rem 1.5rem;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.6rem;
     justify-content: center;
 }
 
 .card-remaining {
     background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
     grid-column: 1 / -1;
-    box-shadow: 0 6px 24px rgba(109, 40, 217, 0.35);
+    box-shadow: 0 8px 32px rgba(109, 40, 217, 0.4);
 }
 
 .card-income {
     background: linear-gradient(135deg, #065f46 0%, #059669 100%);
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.25);
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
 }
 
 .card-expense {
     background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
-    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
 }
 
 .card-label {
-    font-size: 0.725rem;
-    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
 }
 
 .card-value {
-    font-size: 1.6rem;
+    font-size: 2rem;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.03em;
@@ -81,7 +85,7 @@
 }
 
 .card-value-large {
-    font-size: 2rem;
+    font-size: 2.75rem;
 }
 
 /* Action buttons */
@@ -89,7 +93,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    max-width: 420px;
+    width: 100%;
+    max-width: 520px;
     margin-bottom: 2.5rem;
 }
 
@@ -136,7 +141,7 @@
 
 /* Form cards */
 .form-card {
-    background: #1a1a2e;
+    background: var(--bg-surface);
     border-radius: 12px;
     padding: 1.25rem;
     display: flex;
@@ -159,9 +164,9 @@
 }
 
 .form-input {
-    background: #0f0f1a;
-    border: 1px solid rgba(167, 139, 250, 0.15);
-    color: #e2e2f0;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-1);
     padding: 0.5rem 0.75rem;
     border-radius: 8px;
     font-size: 0.925rem;
@@ -172,11 +177,11 @@
 }
 
 .form-input:focus {
-    border-color: #a78bfa;
+    border-color: var(--border-focus);
 }
 
 .form-input::placeholder {
-    color: #4a4a6a;
+    color: var(--placeholder);
 }
 
 .form-input-full {
@@ -185,9 +190,9 @@
 }
 
 .form-select-sm {
-    background: #0f0f1a;
-    border: 1px solid rgba(167, 139, 250, 0.15);
-    color: #e2e2f0;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-1);
     padding: 0.5rem 0.5rem;
     border-radius: 8px;
     font-size: 0.925rem;
@@ -200,12 +205,12 @@
 }
 
 .form-select-sm:focus {
-    border-color: #a78bfa;
+    border-color: var(--border-focus);
 }
 
 .btn-submit {
-    background: #a78bfa;
-    color: #0f0f1a;
+    background: var(--accent);
+    color: var(--accent-text);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -218,13 +223,13 @@
 }
 
 .btn-submit:hover {
-    background: #c4b5fd;
+    background: var(--accent-hover);
 }
 
 .btn-cancel {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #6b6b8a;
+    border: 1px solid var(--border);
+    color: var(--text-3);
     padding: 0.35rem 0.875rem;
     border-radius: 8px;
     font-size: 0.825rem;
@@ -235,8 +240,8 @@
 }
 
 .btn-cancel:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    color: #c4c4d4;
+    border-color: var(--border-medium);
+    color: var(--text-1);
 }
 
 /* Chart */
@@ -247,7 +252,7 @@
 .chart-title {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #4a4a6a;
+    color: var(--text-3);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 1.25rem;
@@ -279,13 +284,13 @@
 }
 
 .legend-text {
-    color: #c4c4d4;
+    color: var(--text-2);
     font-size: 0.875rem;
     min-width: 80px;
 }
 
 .legend-percent {
-    color: #6b6b8a;
+    color: var(--text-3);
     font-size: 0.875rem;
     font-variant-numeric: tabular-nums;
 }

@@ -29,6 +29,19 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    <script>
+        (function () {
+            var t = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+        window.themeInterop = {
+            getTheme: function () { return localStorage.getItem('theme') || 'dark'; },
+            setTheme: function (t) {
+                document.documentElement.setAttribute('data-theme', t);
+                localStorage.setItem('theme', t);
+            }
+        };
+    </script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 

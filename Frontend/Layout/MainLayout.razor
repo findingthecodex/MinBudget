@@ -2,14 +2,18 @@
 @using MinBudget.Services
 @inject AuthTokenService AuthService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <header class="navbar">
     <div class="navbar-inner">
         <a class="navbar-brand" href="/">MinBudget</a>
         <nav class="navbar-links">
             <NavLink href="" Match="NavLinkMatch.All">Hem</NavLink>
-            <NavLink href="/Overview" Match="NavLinkMatch.All">Översikt</NavLink>
+            <NavLink href="/overview" Match="NavLinkMatch.All">Översikt</NavLink>
         </nav>
+        <button class="theme-toggle" @onclick="ToggleTheme" title="Byt tema">
+            @(isDark ? "☀" : "☾")
+        </button>
         <button class="logout-btn" @onclick="Logout">Logga ut</button>
     </div>
 </header>
@@ -19,6 +23,24 @@
 </main>
 
 @code {
+    private bool isDark = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var theme = await JS.InvokeAsync<string>("themeInterop.getTheme");
+            isDark = theme != "light";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDark = !isDark;
+        await JS.InvokeVoidAsync("themeInterop.setTheme", isDark ? "dark" : "light");
+    }
+
     private async Task Logout()
     {
         await AuthService.ClearAsync();
