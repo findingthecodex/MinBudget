@@ -1,16 +1,27 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
+@inherits LayoutComponentBase
+@using MinBudget.Services
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
+
+<header class="navbar">
+    <div class="navbar-inner">
+        <a class="navbar-brand" href="/">MinBudget</a>
+        <nav class="navbar-links">
+            <NavLink href="" Match="NavLinkMatch.All">Hem</NavLink>
+            <NavLink href="/Overview" Match="NavLinkMatch.All">Översikt</NavLink>
+        </nav>
+        <button class="logout-btn" @onclick="Logout">Logga ut</button>
     </div>
+</header>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+<main class="main-content">
+    @Body
+</main>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@code {
+    private async Task Logout()
+    {
+        await AuthService.ClearAsync();
+        Navigation.NavigateTo("/login");
+    }
+}

@@ -14,18 +14,6 @@
         </div>
     </div>
 }
-else if (!isAuthenticated)
-{
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <h2 class="mb-4">Welcome to MinBudget</h2>
-                <p class="mb-4">Please login to continue</p>
-                <a href="/login" class="btn btn-primary btn-lg">Go to Login</a>
-            </div>
-        </div>
-    </div>
-}
 else
 {
 <!-- Huvudbehållare för komponenten. `@key` hjälper Blazor att effektivt uppdatera gränssnittet när `selectedYear` eller `selectedMonth` ändras. -->
@@ -222,9 +210,10 @@ else
         // Check authentication
         isAuthenticated = await AuthService.IsAuthenticatedAsync();
         isLoading = false;
-        
+
         if (!isAuthenticated)
         {
+            Navigation.NavigateTo("/login");
             return;
         }
 
