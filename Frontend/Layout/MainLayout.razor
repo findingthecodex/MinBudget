@@ -1,66 +1,9 @@
 @inherits LayoutComponentBase
-@using MinBudget.Services
-@inject AuthTokenService AuthService
-@inject NavigationManager Navigation
-@inject IJSRuntime JS
 
-<header class="navbar">
-    <div class="navbar-inner">
-        <a class="navbar-brand" href="/">MinBudget</a>
-        <nav class="navbar-links">
-            <NavLink href="" Match="NavLinkMatch.All">Hem</NavLink>
-            <NavLink href="/overview">Översikt</NavLink>
-        </nav>
-        <button class="theme-toggle" @onclick="ToggleTheme" title="Byt tema">
-            @(isDark ? "☀" : "☾")
-        </button>
-        <button class="logout-btn" @onclick="Logout">Logga ut</button>
-        <button class="hamburger" @onclick="ToggleMenu" aria-label="Meny">
-            @if (menuOpen) { <span>✕</span> } else { <span>☰</span> }
-        </button>
-    </div>
-
-    @if (menuOpen)
-    {
-        <nav class="mobile-menu">
-            <NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Hem</NavLink>
-            <NavLink href="/overview" @onclick="CloseMenu">Översikt</NavLink>
-            <div class="mobile-menu-divider"></div>
-            <button class="mobile-logout" @onclick="Logout">Logga ut</button>
-        </nav>
-    }
-</header>
+<NavBar />
 
 <main class="main-content">
     @Body
 </main>
 
-@code {
-    private bool isDark = true;
-    private bool menuOpen = false;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            var theme = await JS.InvokeAsync<string>("themeInterop.getTheme");
-            isDark = theme != "light";
-            StateHasChanged();
-        }
-    }
-
-    private async Task ToggleTheme()
-    {
-        isDark = !isDark;
-        await JS.InvokeVoidAsync("themeInterop.setTheme", isDark ? "dark" : "light");
-    }
-
-    private void ToggleMenu() => menuOpen = !menuOpen;
-    private void CloseMenu() => menuOpen = false;
-
-    private async Task Logout()
-    {
-        await AuthService.ClearAsync();
-        Navigation.NavigateTo("/login");
-    }
-}
+<AppFooter />

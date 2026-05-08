@@ -1,0 +1,37 @@
+@page "/"
+@layout LandingLayout
+@using MinBudget.Services
+@using MinBudget.Layout
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
+
+<div class="landing">
+
+    <section class="hero">
+        <div class="hero-badge">Gratis &amp; privat</div>
+        <h1 class="hero-title">Håll koll på<br><span class="hero-title-accent">ekonomin.</span></h1>
+        <p class="hero-subtitle">Spåra inkomster och utgifter.<br>Se balansen månad för månad.</p>
+        <div class="hero-actions">
+            <a class="btn-primary-landing" href="/register">Skapa konto</a>
+            <a class="btn-ghost-landing" href="/login">Logga in</a>
+        </div>
+    </section>
+
+    <div class="features-bar">
+        <span>Inkomster &amp; utgifter</span>
+        <span class="features-dot">·</span>
+        <span>Månadsöversikt</span>
+        <span class="features-dot">·</span>
+        <span>Alltid gratis</span>
+    </div>
+
+
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+            Navigation.NavigateTo("/dashboard");
+    }
+}

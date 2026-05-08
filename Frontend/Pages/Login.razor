@@ -6,69 +6,49 @@
 @inject AuthTokenService AuthService
 @inject NavigationManager Navigation
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">MinBudget Login</h2>
+<div class="login-card">
+        <h2 class="login-title">MinBudget</h2>
 
-                    @if (!string.IsNullOrEmpty(errorMessage))
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            @errorMessage
-                            <button type="button" class="btn-close" @onclick="ClearError"></button>
-                        </div>
-                    }
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="login-error" style="margin-bottom: 1.25rem;">
+                <span class="login-error-text">@errorMessage</span>
+                <button class="login-error-close" @onclick="ClearError" aria-label="Stäng">&#x2715;</button>
+            </div>
+        }
 
-                    @if (isLoading)
-                    {
-                        <div class="text-center">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <form>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" 
-                                    @bind="email" placeholder="Enter email" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" 
-                                    @bind="password" placeholder="Enter password" required>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary" @onclick="HandleLogin">
-                                    Login
-                                </button>
-                            </div>
-
-                            <hr />
-
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-secondary" @onclick="HandleRegister">
-                                    Register New Account
-                                </button>
-                            </div>
-                        </form>
-                    }
+        @if (isLoading)
+        {
+            <div class="login-loading">
+                <div class="login-spinner" role="status" aria-label="Laddar..."></div>
+            </div>
+        }
+        else
+        {
+            <form class="login-form">
+                <div class="field-group">
+                    <label for="email" class="field-label">Email</label>
+                    <input type="email" class="field-input" id="email"
+                        @bind="email" placeholder="din@email.se" required>
                 </div>
-            </div>
 
-            <div class="text-center mt-3">
-                <small class="text-muted">
-                    Test credentials: user@test.com / Password123!
-                </small>
-            </div>
-        </div>
-    </div>
+                <div class="field-group">
+                    <label for="password" class="field-label">Lösenord</label>
+                    <input type="password" class="field-input" id="password"
+                        @bind="password" placeholder="••••••••" required>
+                </div>
+
+                <button type="button" class="btn-login" @onclick="HandleLogin">
+                    Logga in
+                </button>
+
+                <div class="login-divider"><span>eller</span></div>
+
+                <button type="button" class="btn-register" @onclick='() => Navigation.NavigateTo("/register")'>
+                    Registrera nytt konto
+                </button>
+            </form>
+        }
 </div>
 
 @code {
@@ -101,55 +81,11 @@
             if (response.Success)
             {
                 // Redirect to home page
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/dashboard");
             }
             else
             {
                 errorMessage = response.Error ?? "Login failed";
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private async Task HandleRegister()
-    {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
-        {
-            errorMessage = "Email and password are required";
-            return;
-        }
-
-        isLoading = true;
-        errorMessage = null;
-
-        try
-        {
-            var response = await ApiClient.RegisterAsync(email, password);
-
-            if (response.Success)
-            {
-                errorMessage = null;
-                // Auto-login after registration
-                var loginResponse = await ApiClient.LoginAsync(email, password);
-                if (loginResponse.Success)
-                {
-                    Navigation.NavigateTo("/");
-                }
-                else
-                {
-                    errorMessage = "Registration successful! Please login.";
-                }
-            }
-            else
-            {
-                errorMessage = response.Error ?? "Registration failed";
             }
         }
         catch (Exception ex)

@@ -1,0 +1,83 @@
+@using MinBudget.Services
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<header class="app-navbar">
+    <div class="app-navbar-inner">
+        <div class="app-navbar-left">
+            <a class="app-navbar-brand" href="@(isAuthenticated ? "/dashboard" : "/")">MinBudget</a>
+            @if (isAuthenticated)
+            {
+                <nav class="app-navbar-links">
+                    <NavLink href="/dashboard" Match="NavLinkMatch.All">Hem</NavLink>
+                    <NavLink href="/overview">Översikt</NavLink>
+                </nav>
+            }
+        </div>
+
+        <div class="app-navbar-right">
+            <button class="app-theme-toggle" @onclick="ToggleTheme" title="Byt tema">
+                @(isDark ? "☀" : "☾")
+            </button>
+            @if (isAuthenticated)
+            {
+                <button class="app-logout-btn" @onclick="Logout">Logga ut</button>
+                <button class="app-hamburger" @onclick="ToggleMenu" aria-label="Meny">
+                    @if (menuOpen) { <span>✕</span> } else { <span>☰</span> }
+                </button>
+            }
+            else
+            {
+                <a class="app-navbar-login" href="/login">Logga in</a>
+                <a class="app-navbar-register" href="/register">Skapa konto</a>
+            }
+        </div>
+    </div>
+
+    @if (menuOpen && isAuthenticated)
+    {
+        <nav class="app-mobile-menu">
+            <NavLink href="/dashboard" Match="NavLinkMatch.All" @onclick="CloseMenu">Hem</NavLink>
+            <NavLink href="/overview" @onclick="CloseMenu">Översikt</NavLink>
+            <div class="app-mobile-divider"></div>
+            <button class="app-mobile-logout" @onclick="Logout">Logga ut</button>
+        </nav>
+    }
+</header>
+
+@code {
+    private bool isAuthenticated = false;
+    private bool isDark = true;
+    private bool menuOpen = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isAuthenticated = await AuthService.IsAuthenticatedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var theme = await JS.InvokeAsync<string>("themeInterop.getTheme");
+            isDark = theme != "light";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        isDark = !isDark;
+        await JS.InvokeVoidAsync("themeInterop.setTheme", isDark ? "dark" : "light");
+    }
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+    private void CloseMenu() => menuOpen = false;
+
+    private async Task Logout()
+    {
+        await AuthService.ClearAsync();
+        Navigation.NavigateTo("/login");
+    }
+}

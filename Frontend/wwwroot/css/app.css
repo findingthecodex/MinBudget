@@ -154,3 +154,13 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
+
+/* Footer */
+.landing-footer {
+    border-top: 1px solid var(--border);
+    padding: 1rem 2rem;
+    margin-top: 2rem;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 0.8rem;
+}
