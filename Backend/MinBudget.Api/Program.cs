@@ -11,9 +11,15 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Database
+// Azure App Service sets HOME to persistent storage: /home (Linux) or D:\home (Windows)
+var homeDir = Environment.GetEnvironmentVariable("HOME");
+var dbPath = homeDir != null
+    ? Path.Combine(homeDir, "minbudget.db")
+    : "minbudget.db";
+Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(dbPath))!);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? 
-        "Data Source=minbudget.db"));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 // Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
