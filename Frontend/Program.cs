@@ -7,10 +7,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// API Base Address - adjust for production
-var apiBaseAddress = builder.HostEnvironment.IsDevelopment() 
-    ? "https://localhost:7082" 
-    : "https://api.minbudget.com";
+var apiBaseAddress = builder.HostEnvironment.IsDevelopment()
+    ? "https://localhost:7082"
+    : builder.HostEnvironment.BaseAddress;
 
 // HttpClient for API
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
