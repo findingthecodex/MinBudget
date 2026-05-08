@@ -95,6 +95,25 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Prevent browsers from caching CSS and the Blazor boot manifest between deployments.
+// MinBudget.styles.css has no content hash in its name so stale caches cause scoped
+// CSS attributes (b-xxxx) in the HTML to stop matching the rules in the CSS file.
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value ?? "";
+    if (path.EndsWith(".css", StringComparison.OrdinalIgnoreCase) ||
+        path.EndsWith("blazor.boot.json", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.OnStarting(() =>
+        {
+            context.Response.Headers["Cache-Control"] = "no-cache";
+            return Task.CompletedTask;
+        });
+    }
+    await next();
+});
+
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseCors("AllowBlazor");
