@@ -1,4 +1,4 @@
-@page "/"
+@page "/dashboard"
 @using MinBudget.Services
 
 @inject IJSRuntime Js
@@ -16,125 +16,127 @@
 }
 else if (isAuthenticated)
 {
-<div class="home-page" @key="selectedYear + '-' + selectedMonth">
-    <PageTitle>MinBudget</PageTitle>
+    <div class="home-page" @key="selectedYear + '-' + selectedMonth">
+        <PageTitle>MinBudget</PageTitle>
 
-    <div class="period-selector">
-        <InputSelect @bind-Value="selectedMonth" @bind-Value:after="PeriodChanged" class="period-select">
-            @foreach (var m in months)
-            {
-                <option value="@m.Value">@m.Name</option>
-            }
-        </InputSelect>
-        <InputSelect @bind-Value="selectedYear" @bind-Value:after="PeriodChanged" class="period-select">
-            @foreach (var y in years)
-            {
-                <option value="@y">@y</option>
-            }
-        </InputSelect>
-    </div>
-
-    @{
-        var incomeTotal   = BudgetManager.TotalIncome();
-        var expenseTotal  = BudgetManager.TotalExpense();
-        var leftThisMonth = BudgetManager.LeftThisMonth();
-    }
-
-    <div class="stats-row">
-        <div class="stat-card card-remaining">
-            <span class="card-label">Kvar denna månad</span>
-            <span class="card-value card-value-large">@Fmt(leftThisMonth) kr</span>
+        <div class="period-selector">
+            <InputSelect @bind-Value="selectedMonth" @bind-Value:after="PeriodChanged" class="period-select">
+                @foreach (var m in months)
+                {
+                    <option value="@m.Value">@m.Name</option>
+                }
+            </InputSelect>
+            <InputSelect @bind-Value="selectedYear" @bind-Value:after="PeriodChanged" class="period-select">
+                @foreach (var y in years)
+                {
+                    <option value="@y">@y</option>
+                }
+            </InputSelect>
         </div>
-        <div class="stat-card card-income">
-            <span class="card-label">Inkomst</span>
-            <span class="card-value">@Fmt(incomeTotal) kr</span>
-        </div>
-        <div class="stat-card card-expense">
-            <span class="card-label">Utgifter</span>
-            <span class="card-value">@Fmt(expenseTotal) kr</span>
-        </div>
-    </div>
 
-    <div class="action-section">
-        @if (!showIncomeForm)
-        {
-            <button class="btn-add btn-add-income" @onclick="() => showIncomeForm = true">+ Lägg till inkomst</button>
+        @{
+            var incomeTotal   = BudgetManager.TotalIncome();
+            var expenseTotal  = BudgetManager.TotalExpense();
+            var leftThisMonth = BudgetManager.LeftThisMonth();
         }
-        else
-        {
-            <div class="form-card form-card-income">
-                <EditForm Model="_incomeModel" OnValidSubmit="AddIncomeAsync">
-                    <div class="form-row">
-                        <InputNumber @bind-Value="_incomeModel.Value" placeholder="Belopp..." class="form-input" />
-                        <InputSelect @bind-Value="_incomeModel.Category" class="form-select-sm">
-                            <option value="Lön">Lön</option>
-                            <option value="CSN">CSN</option>
-                        </InputSelect>
-                        <button type="submit" class="btn-submit">Lägg till</button>
-                    </div>
-                    <InputText @bind-Value="_incomeModel.Description" placeholder="Notering (valfritt)" class="form-input form-input-full" />
-                </EditForm>
-                <button class="btn-cancel" @onclick="() => showIncomeForm = false">Avbryt</button>
+
+        <div class="stats-row">
+            <div class="stat-card card-remaining">
+                <span class="card-label">Kvar denna månad</span>
+                <span class="card-value card-value-large">@Fmt(leftThisMonth) kr</span>
             </div>
-        }
-
-        @if (!showExpenseForm)
-        {
-            <button class="btn-add btn-add-expense" @onclick="() => showExpenseForm = true">+ Lägg till utgift</button>
-        }
-        else
-        {
-            <div class="form-card form-card-expense">
-                <EditForm Model="_expenseModel" OnValidSubmit="AddExpenseAsync">
-                    <div class="form-row">
-                        <InputNumber @bind-Value="_expenseModel.Value" placeholder="Belopp..." class="form-input" />
-                        <InputSelect @bind-Value="_expenseModel.Category" class="form-select-sm">
-                            <option value="Mat">Mat</option>
-                            <option value="Hyra">Hyra</option>
-                            <option value="Nöje">Nöje</option>
-                            <option value="Transport">Transport</option>
-                            <option value="Övrigt">Övrigt</option>
-                            <option value="Spara">Spara</option>
-                        </InputSelect>
-                        <button type="submit" class="btn-submit">Lägg till</button>
-                    </div>
-                    <InputText @bind-Value="_expenseModel.Description" placeholder="Notering (valfritt)" class="form-input form-input-full" />
-                </EditForm>
-                <button class="btn-cancel" @onclick="() => showExpenseForm = false">Avbryt</button>
+            <div class="stat-card card-income">
+                <span class="card-label">Inkomst</span>
+                <span class="card-value">@Fmt(incomeTotal) kr</span>
             </div>
-        }
-    </div>
+            <div class="stat-card card-expense">
+                <span class="card-label">Utgifter</span>
+                <span class="card-value">@Fmt(expenseTotal) kr</span>
+            </div>
+        </div>
 
-    @if (BudgetManager.Expenses.Count > 0)
-    {
-        <div class="chart-section">
-            <p class="chart-title">Utgifter per kategori</p>
-            <div class="chart-container">
-                <svg width="160" height="160" viewBox="0 0 200 200" style="transform: rotate(-90deg); flex-shrink: 0;">
-                    <circle r="70" cx="100" cy="100" fill="transparent" stroke="rgba(255,255,255,0.06)" stroke-width="40" />
-                    @foreach (var slice in GetDonutSlices())
-                    {
-                        <circle r="70" cx="100" cy="100" fill="transparent"
-                                stroke="@slice.Color"
-                                stroke-width="40"
-                                stroke-dasharray="@slice.StrokeDashArray"
-                                stroke-dashoffset="@slice.StrokeDashOffset" />
-                    }
-                </svg>
-                <div class="chart-legend">
-                    @foreach (var cat in GetCategoryPercentages())
-                    {
-                        <div class="legend-item">
-                            <span class="legend-dot" style="background: @cat.Color;"></span>
-                            <span class="legend-text">@cat.Name</span>
-                            <span class="legend-percent">@cat.Percent%</span>
+        <div class="action-section">
+            @if (!showIncomeForm)
+            {
+                <button class="btn-add btn-add-income" @onclick="() => showIncomeForm = true">+ Lägg till inkomst</button>
+            }
+            else
+            {
+                <div class="form-card form-card-income">
+                    <EditForm Model="_incomeModel" OnValidSubmit="AddIncomeAsync">
+                        <div class="form-row">
+                            <InputNumber @bind-Value="_incomeModel.Value" placeholder="Belopp..." class="form-input" />
+                            <InputSelect @bind-Value="_incomeModel.Category" class="form-select-sm">
+                                <option value="Lön">Lön</option>
+                                <option value="CSN">CSN</option>
+                            </InputSelect>
+                            <button type="submit" class="btn-submit">Lägg till</button>
                         </div>
-                    }
+                        <InputText @bind-Value="_incomeModel.Description" placeholder="Notering (valfritt)" class="form-input form-input-full" />
+                    </EditForm>
+                    <button class="btn-cancel" @onclick="() => showIncomeForm = false">Avbryt</button>
+                </div>
+            }
+
+            @if (!showExpenseForm)
+            {
+                <button class="btn-add btn-add-expense" @onclick="() => showExpenseForm = true">+ Lägg till utgift</button>
+            }
+            else
+            {
+                <div class="form-card form-card-expense">
+                    <EditForm Model="_expenseModel" OnValidSubmit="AddExpenseAsync">
+                        <div class="form-row">
+                            <InputNumber @bind-Value="_expenseModel.Value" placeholder="Belopp..." class="form-input" />
+                            <InputSelect @bind-Value="_expenseModel.Category" class="form-select-sm">
+                                <option value="Mat">Mat</option>
+                                <option value="Hyra">Hyra</option>
+                                <option value="Nöje">Nöje</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Övrigt">Övrigt</option>
+                                <option value="Spara">Spara</option>
+                            </InputSelect>
+                            <button type="submit" class="btn-submit">Lägg till</button>
+                        </div>
+                        <InputText @bind-Value="_expenseModel.Description" placeholder="Notering (valfritt)" class="form-input form-input-full" />
+                    </EditForm>
+                    <button class="btn-cancel" @onclick="() => showExpenseForm = false">Avbryt</button>
+                </div>
+            }
+        </div>
+
+        @if (BudgetManager.Expenses.Count > 0)
+        {
+            <div class="chart-section">
+                <p class="chart-title">Utgifter per kategori</p>
+                <div class="chart-container">
+                    <svg width="160" height="160" viewBox="0 0 200 200" style="transform: rotate(-90deg); flex-shrink: 0;">
+                        <circle r="70" cx="100" cy="100" fill="transparent" stroke="rgba(255,255,255,0.06)" stroke-width="40" />
+                        @foreach (var slice in GetDonutSlices())
+                        {
+                            <circle r="70" cx="100" cy="100" fill="transparent"
+                                    stroke="@slice.Color"
+                                    stroke-width="40"
+                                    stroke-dasharray="@slice.StrokeDashArray"
+                                    stroke-dashoffset="@slice.StrokeDashOffset" />
+                        }
+                    </svg>
+                    <div class="chart-legend">
+                        @foreach (var cat in GetCategoryPercentages())
+                        {
+                            <div class="legend-item">
+                                <span class="legend-dot" style="background: @cat.Color;"></span>
+                                <span class="legend-text">@cat.Name</span>
+                                <span class="legend-percent">@cat.Percent%</span>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+    
+    
 }
 
 @code {
@@ -168,7 +170,7 @@ else if (isAuthenticated)
 
         if (!isAuthenticated)
         {
-            Navigation.NavigateTo("/login");
+            Navigation.NavigateTo("/");
             return;
         }
 

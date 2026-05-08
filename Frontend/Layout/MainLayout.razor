@@ -6,9 +6,9 @@
 
 <header class="navbar">
     <div class="navbar-inner">
-        <a class="navbar-brand" href="/">MinBudget</a>
+        <a class="navbar-brand" href="/dashboard">MinBudget</a>
         <nav class="navbar-links">
-            <NavLink href="" Match="NavLinkMatch.All">Hem</NavLink>
+            <NavLink href="/dashboard" Match="NavLinkMatch.All">Hem</NavLink>
             <NavLink href="/overview">Översikt</NavLink>
         </nav>
         <button class="theme-toggle" @onclick="ToggleTheme" title="Byt tema">
@@ -23,7 +23,7 @@
     @if (menuOpen)
     {
         <nav class="mobile-menu">
-            <NavLink href="" Match="NavLinkMatch.All" @onclick="CloseMenu">Hem</NavLink>
+            <NavLink href="/dashboard" Match="NavLinkMatch.All" @onclick="CloseMenu">Hem</NavLink>
             <NavLink href="/overview" @onclick="CloseMenu">Översikt</NavLink>
             <div class="mobile-menu-divider"></div>
             <button class="mobile-logout" @onclick="Logout">Logga ut</button>

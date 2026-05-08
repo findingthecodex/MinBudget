@@ -94,7 +94,7 @@
             if (response.Success && response.Data != null)
             {
                 await AuthService.SaveTokenAsync(response.Data.Token, response.Data.UserId, response.Data.Email);
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/dashboard");
             }
             else
             {
