@@ -1,0 +1,118 @@
+@page "/register"
+@layout LoginLayout
+@using MinBudget.Services
+@using MinBudget.Layout
+@inject ApiClientService ApiClient
+@inject AuthTokenService AuthService
+@inject NavigationManager Navigation
+
+<div class="login-card">
+    <h2 class="login-title">Skapa konto</h2>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="login-error" style="margin-bottom: 1.25rem;">
+            <span class="login-error-text">@errorMessage</span>
+            <button class="login-error-close" @onclick="ClearError" aria-label="Stäng">&#x2715;</button>
+        </div>
+    }
+
+    @if (isLoading)
+    {
+        <div class="login-loading">
+            <div class="login-spinner" role="status" aria-label="Laddar..."></div>
+        </div>
+    }
+    else
+    {
+        <form class="login-form">
+            <div class="field-group">
+                <label for="email" class="field-label">Email</label>
+                <input type="email" class="field-input" id="email"
+                    @bind="email" placeholder="din@email.se" required>
+            </div>
+
+            <div class="field-group">
+                <label for="password" class="field-label">Lösenord</label>
+                <input type="password" class="field-input" id="password"
+                    @bind="password" placeholder="••••••••" required>
+            </div>
+
+            <div class="field-group">
+                <label for="confirmPassword" class="field-label">Bekräfta lösenord</label>
+                <input type="password" class="field-input" id="confirmPassword"
+                    @bind="confirmPassword" placeholder="••••••••" required>
+            </div>
+
+            <button type="button" class="btn-login" @onclick="HandleRegister">
+                Skapa konto
+            </button>
+
+            <div class="login-divider"><span>eller</span></div>
+
+            <button type="button" class="btn-register" @onclick='() => Navigation.NavigateTo("/login")'>
+                Tillbaka till inloggning
+            </button>
+        </form>
+    }
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string confirmPassword = "";
+    private string? errorMessage;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+            Navigation.NavigateTo("/");
+    }
+
+    private async Task HandleRegister()
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            errorMessage = "Email och lösenord krävs";
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            errorMessage = "Lösenorden matchar inte";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await ApiClient.RegisterAsync(email, password);
+
+            if (response.Success && response.Data != null)
+            {
+                await AuthService.SaveTokenAsync(response.Data.Token, response.Data.UserId, response.Data.Email);
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = response.Error ?? "Registrering misslyckades";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Fel: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ClearError()
+    {
+        errorMessage = null;
+    }
+}
