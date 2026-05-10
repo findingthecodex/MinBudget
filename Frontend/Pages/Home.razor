@@ -128,6 +128,7 @@ else if (isAuthenticated)
                                 <span class="legend-dot" style="background: @cat.Color;"></span>
                                 <span class="legend-text">@cat.Name</span>
                                 <span class="legend-percent">@cat.Percent%</span>
+                                <span class="legend-amount">@cat.Amount.ToString("C0")</span>
                             </div>
                         }
                     </div>
@@ -225,7 +226,7 @@ else if (isAuthenticated)
     }
 
     public class DonutSlice { public string Color { get; set; } public string StrokeDashArray { get; set; } public double StrokeDashOffset { get; set; } }
-    public class CategoryPercent { public string? Name { get; set; } public double Percent { get; set; } public string? Color { get; set; } }
+    public class CategoryPercent { public string? Name { get; set; } public double Percent { get; set; } public string? Color { get; set; } public double Amount { get; set; } }
 
     private readonly string[] _categoryColors = { "#60a5fa", "#fb923c", "#f472b6", "#34d399", "#a78bfa", "#fbbf24" };
     private readonly string[] _categoryNames = { "Mat", "Hyra", "Nöje", "Transport", "Övrigt", "Spara" };
@@ -238,7 +239,7 @@ else if (isAuthenticated)
         {
             double sum = (double)BudgetManager.Expenses.Where(e => e.Category == _categoryNames[i]).Sum(e => e.Amount);
             double percent = total > 0 ? Math.Round(sum / total * 100, 1) : 0;
-            cats.Add(new CategoryPercent { Name = _categoryNames[i], Percent = percent, Color = _categoryColors[i] });
+            cats.Add(new CategoryPercent { Name = _categoryNames[i], Percent = percent, Color = _categoryColors[i], Amount = sum });
         }
         if (total == 0)
         {
